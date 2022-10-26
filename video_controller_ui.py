@@ -74,7 +74,7 @@ class VideoUI(ui.UI):
             text="Select File",
             width=25,
             height=5,
-            bg="blue",
+            bg="green",
             fg="yellow",
             command=self.selectFile
         )
@@ -83,7 +83,7 @@ class VideoUI(ui.UI):
             text="Export File",
             width=25,
             height=5,
-            bg="blue",
+            bg="orange",
             fg="yellow",
             command=self.exportData
         )

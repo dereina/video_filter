@@ -1,3 +1,6 @@
+usage:
+    run the main.py 
+
 
 ControllerInterface(abstract)
     abstract class to be implemented for the ui to interact with a controller that also implements the interface
