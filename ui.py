@@ -37,6 +37,10 @@ class ControllerInterface(ABC):
         pass
 
     @abstractmethod
+    def stopCurrent(self):
+        pass
+
+    @abstractmethod
     def selectFile(self, path = None):
         pass
 
@@ -118,37 +122,25 @@ class UI(ControllerInterface, threading.Thread):
         super().__init__()
         self.controller = controller
         self.task_frame_rate = task_frame_rate
-        #ui objects definition
         self.window = tk.Tk()
         
         #self.window.after(self.task_frame_rate, self.run)  # reschedule event in task_frame_rate seconds
 
         self.running = True
-
-        self.window.protocol("WM_DELETE_WINDOW", self.stop)
-
+        self.window.protocol("WM_DELETE_WINDOW", self.stopCurrent)
         threading.Thread.__init__(self)
 
-
-    def stop(self):
-        print("stopping")
+    def stopCurrent(self):
+        self.controller.stopCurrent()
         self.running = False
-        #time.sleep(1)
-        self.window.quit()
 
     def run(self):
-        print("run")
         start_time = time.perf_counter()
-
         out = self.controller.run()
-        
-
         end_time = time.perf_counter()
         total_time = self.task_frame_rate - (end_time - start_time)
-        print(self.task_frame_rate)
         if total_time > 0:
             time.sleep(total_time / 1000)
-        #elf.window.after(self.task_frame_rate, self.run)
 
         return out
 
@@ -156,10 +148,6 @@ class UI(ControllerInterface, threading.Thread):
         self.start()
         self.window.mainloop()
         
-
-
-
-
     def callbackSample(self):
         print("callbackSample ")
         self.controller.callbackSample()
@@ -194,46 +182,4 @@ class UI(ControllerInterface, threading.Thread):
         f.close()
         os.remove(f.name)
         self.controller.exportData(f.name)
-
-def handle_click(event):
-    print("The button was clicked!")
-
-def handle_keypress(event):
-    """Print the character associated to the key pressed"""
-    print(event.char)
-
-"""
-window = tk.Tk()
-label = tk.Label(master=window, text="0")
-entry = tk.Entry()
-
-def callback():
-    value = int(label["text"])
-    label["text"] = f"{value - 1}"
-    print(value)
-
-button = tk.Button(
-    text="Click me!",
-    width=25,
-    height=5,
-    bg="blue",
-    fg="yellow",
-    command=callback
-)
-label.pack()
-entry.pack()
-button.pack()
-
-
-
-
-button.bind("<Button-2>", handle_click)
-window.bind("<Key>", handle_keypress)
-
-window.mainloop()
-"""
-
-# Bind keypress event to handle_keypress()
-
-
 

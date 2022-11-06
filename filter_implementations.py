@@ -8,15 +8,10 @@ class Brightness(filter.Filter):
         super().__init__(name=name)
         self.slider = Slider(self.name, begin, end, steps, self.updateParams)
 
-        
-
     def process(self, params, image):
-        #print("brightness")
-        #print(self.slider.getHomogeneousCenteredValue())
         value = self.slider.getHomogeneousCenteredValue()
         value = np.exp(value)
         image = np.clip(image * value, 0 , 255).astype(np.uint8)
-
         return image #super().process(params, image)
 
     def getUIMetadata(self):
@@ -37,11 +32,9 @@ class Hue(filter.Filter):
         self.v = Slider("value", 0,255,255, self.updateParams)
 
     def process(self, params, image):
-        #print("hue")
         hue = self.h.getHomogeneousValue()
         sat = self.s.getHomogeneousValue()
         val = self.v.getHomogeneousValue()
-
         # convert to HSV
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         #h = hsv[:,:,0]
@@ -57,23 +50,15 @@ class Hue(filter.Filter):
         #vnew = (v + diffv)
         hnew = np.clip(h + diffh, 0, 180)#.astype(np.uint8)
         snew = np.clip(s + diffs, 0, 255)#.astype(np.uint8)
-        vnew = np.clip(v + diffv, 0, 255)#.astype(np.uint8)
-
-        
+        vnew = np.clip(v + diffv, 0, 255)#.astype(np.uint8)    
         #hnew = h + diffh
         #snew = s + diffs
         #vnew = v + diffv
-
         hsv_new = cv2.merge([hnew,snew,vnew])
-
         image = cv2.cvtColor(hsv_new, cv2.COLOR_HSV2BGR)
-
         return image # super().process(params, image)
 
     def getUIMetadata(self):
-        #h = Slider("hue", 0, 100, 100)
-        #s = Slider("saturation", 0, 100, 100)
-        #v = Slider("value", 0, 100, 100) 
         meta = [
             self.h,
             self.s,

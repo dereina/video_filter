@@ -1,7 +1,6 @@
 from functools import wraps
 import time
 
-
 def timeit(func):
     @wraps(func)
     def timeit_wrapper(*args, **kwargs):
@@ -12,4 +11,5 @@ def timeit(func):
         # first item in the args, ie `args[0]` is `self`
         print(f'Function {func.__name__}{args} {kwargs} Took {total_time:.4f} seconds')
         return result
+
     return timeit_wrapper

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import cv2
 import threading
+
 class Param():
     def __init__(self) -> None:
         pass
@@ -25,40 +26,33 @@ class Filter(ABC):
     @abstractmethod
     def updateParams(self, params):
         pass
-    
-
 
 class VideoFilter():
     def __init__(self, size=None) -> None:
         self.video_url = ""
         self.filters = np.array([], dtype=Filter)
         self.size = size
-        print("filters shape ", self.filters.shape)
-
         self.cap = None
-
         self.exporting = False
         self.mutex = threading.Lock()
 
+    def stop(self):
+        if self.cap is not None:
+            self.cap.release()
+            self.cap=None
 
     def selectVideo(self, url):
-        print("begin export")
-        self.mutex.acquire()
         if self.cap is not None:
             self.cap.release()
 
         self.video_url = url
         self.cap = cv2.VideoCapture(self.video_url) #IP Camera
         fps = self.cap.get(cv2.CAP_PROP_FPS)
-
-        self.mutex.release()
         return fps
-
 
     def addFilter(self, filter):
         self.mutex.acquire()
         self.filters = np.append(self.filters, filter)
-        print("filters shape ", self.filters.shape)
         self.mutex.release()
 
     def getFilters(self):
@@ -66,10 +60,8 @@ class VideoFilter():
 
     def exportVideo(self, size, out_path_name):
         print("begin export")
-        #self.mutex.acquire()
-        #self.exporting = True
         out = None
-        cap = cv2.VideoCapture(self.video_url) #IP Camera
+        cap = cv2.VideoCapture(self.video_url)
         fps = cap.get(cv2.CAP_PROP_FPS)
         if size is not None:
             out = cv2.VideoWriter(out_path_name, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
@@ -104,12 +96,9 @@ class VideoFilter():
             out.release()
 
         cap.release()
-        #self.exporting = False
         print("end export")
-        #self.mutex.release()
 
     def nextFrame(self):
-        print("next frame")
         if self.cap is None:
             return None
 
@@ -132,21 +121,8 @@ class VideoFilter():
         for i, f in enumerate(self.filters):
             frame = f.process(None, frame)
 
-        #print("showing")
-        #print(frame.shape)
-        #frame=cv2.resize(frame, (960, 540)) 
-        #cv2.imshow('Capturing',frame)
-        
-        #if cv2.waitKey(1) & 0xFF == ord('q'): #click q to stop capturing
-        #    return None
-        
-        #time.sleep(0.1)
-        #count += 10
-        #count = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
-        #print(count)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         self.mutex.release()
-        print("end next frame")
         return frame
 
     def previewVideo(self):
@@ -164,19 +140,14 @@ class VideoFilter():
             for i, f in enumerate(self.filters):
                 frame = f.process(None, frame)
 
-            print("showing")
-            print(frame.shape)
             frame=cv2.resize(frame, (960, 540)) 
             cv2.imshow('Capturing',frame)
             
-            if cv2.waitKey(1) & 0xFF == ord('q'): #click q to stop capturing
+            if cv2.waitKey(1) & 0xFF == ord('q'): 
                 break
             
-            #time.sleep(0.1)
-            #count += 10
             count = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
             print(count)
-            #cap.set(cv2.CAP_PROP_POS_FRAMES, count + 1)
 
         self.cap.release()
         cv2.destroyAllWindows()
