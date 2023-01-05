@@ -139,6 +139,7 @@ class UI(ControllerInterface, threading.Thread):
         out = self.controller.run()
         end_time = time.perf_counter()
         total_time = self.task_frame_rate - (end_time - start_time)
+        print(total_time)
         if total_time > 0:
             time.sleep(total_time / 1000)
 

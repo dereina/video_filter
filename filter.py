@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
 import numpy as np
+import os
+gstreamer_dir = os.getenv('GSTREAMER_DIR') # None
+gstreamerPath = gstreamer_dir+"\\bin"
+os.add_dll_directory(gstreamerPath)
 import cv2
 import threading
 
@@ -41,7 +45,7 @@ class VideoFilter():
             self.cap.release()
             self.cap=None
 
-    def selectVideo(self, url):
+    def selectVideo(self, url, streamer = cv2.CAP_GSTREAMER):
         if self.cap is not None:
             self.cap.release()
 
